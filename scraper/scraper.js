@@ -12,7 +12,6 @@ const agent = new https.Agent({
 
 async function fetchExchangeData(quote, fromDate, toDate) {
   const url = `https://finance.yahoo.com/quote/${quote}/history/?period1=${fromDate}&period2=${toDate}`;
-  console.log("Fetching data from:", url);
 
   try {
     const browser = await puppeteer.launch({ headless: false });
@@ -43,8 +42,6 @@ async function fetchExchangeData(quote, fromDate, toDate) {
         return Array.from(cells).map((cell) => cell.innerText);
       });
     });
-
-    console.log(`Data fetched successfully for ${quote}:`, dataFromPuppeteer);
 
     // Close the browser
     await browser.close();
@@ -78,7 +75,6 @@ async function fetchExchangeData(quote, fromDate, toDate) {
 
     // Ensure the database is connected before storing data
     if (!db) {
-      console.log("Database is not connected. Connecting now...");
       await connectDB(); // Connect to the database if not already connected
     }
     await storeData(data); // Store the data after ensuring db is connected

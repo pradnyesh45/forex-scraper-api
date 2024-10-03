@@ -5,11 +5,7 @@ const {
   connectDB,
   createTables,
 } = require("../scraper/database");
-// const { MongoClient } = require("mongodb");
 require("dotenv").config();
-
-// const uri = process.env.MONGO_URI;
-// const client = new MongoClient(uri);
 
 // Connect to the database once when the app starts
 (async () => {
