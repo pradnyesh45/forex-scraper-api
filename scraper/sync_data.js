@@ -2,9 +2,9 @@ const cron = require("node-cron");
 const { fetchExchangeData } = require("./scraper");
 
 // Schedule to run once a day
-cron.schedule("0 0 * * *", () => {
-  // For testing purposes, we will run the cron job every minute
-  // cron.schedule("* * * * *", () => {
+// cron.schedule("0 0 * * *", () => {
+// For testing purposes, we will run the cron job every minute
+cron.schedule("* * * * *", () => {
   console.log("Running scheduled data sync...");
 
   const currencyPairs = [
