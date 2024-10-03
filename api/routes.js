@@ -1,10 +1,26 @@
 const express = require("express");
 const router = express.Router();
-const { MongoClient } = require("mongodb");
+const {
+  getExchangeRates,
+  connectDB,
+  createTables,
+} = require("../scraper/database");
+// const { MongoClient } = require("mongodb");
 require("dotenv").config();
 
-const uri = process.env.MONGO_URI;
-const client = new MongoClient(uri);
+// const uri = process.env.MONGO_URI;
+// const client = new MongoClient(uri);
+
+// Connect to the database once when the app starts
+(async () => {
+  try {
+    await connectDB();
+    await createTables(); // Ensure tables are created
+    console.log("Database connected and tables created.");
+  } catch (error) {
+    console.error("Error connecting to the database:", error);
+  }
+})();
 
 router.get("/", (req, res) => {
   res.json({ message: "API is working!" });
@@ -13,16 +29,25 @@ router.get("/", (req, res) => {
 router.post("/forex-data", async (req, res) => {
   const { from, to, period } = req.body;
 
+  if (!from || !to || !period) {
+    return res
+      .status(400)
+      .json({ error: "Please provide 'from', 'to', and 'period' fields." });
+  }
+
+  // Calculate the date range
+  const queryDate = new Date(Date.now() - getPeriodInMilliseconds(period));
+  console.log("Querying data from:", queryDate);
+
   try {
-    await client.connect();
-    const collection = client.db("forexDB").collection("exchangeData");
-    const queryDate = new Date(Date.now() - getPeriodInMilliseconds(period));
-    const data = await collection.find({ date: { $gte: queryDate } }).toArray();
+    // Fetch the exchange rates from SQLite
+    const data = await getExchangeRates(from, to, queryDate);
+    if (data.length === 0) {
+      return res.json({ message: "No data found for the given query." });
+    }
     res.json(data);
   } catch (error) {
     res.status(500).json({ error: error.message });
-  } finally {
-    await client.close();
   }
 });
 

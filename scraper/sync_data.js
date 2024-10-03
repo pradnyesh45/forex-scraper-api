@@ -2,28 +2,37 @@ const cron = require("node-cron");
 const { fetchExchangeData } = require("./scraper");
 
 // Schedule to run once a day
-// cron.schedule("0 0 * * *", () => {
-// For testing purposes, we will run the cron job every minute
-cron.schedule("* * * * *", () => {
+cron.schedule("0 0 * * *", () => {
+  // For testing purposes, we will run the cron job every minute
+  // cron.schedule("* * * * *", () => {
   console.log("Running scheduled data sync...");
 
   const currencyPairs = [
-    { from: "GBP", to: "INR", periods: ["1W", "1M", "3M", "6M", "1Y"] },
-    { from: "AED", to: "INR", periods: ["1W", "1M", "3M", "6M", "1Y"] },
+    { from: "GBP", to: "INR" },
+    { from: "AED", to: "INR" },
   ];
 
   currencyPairs.forEach((pair) => {
-    pair.periods.forEach((period) => {
-      const fromDate =
-        Math.floor(Date.now() / 1000) - getPeriodInSeconds(period);
-      const toDate = Math.floor(Date.now() / 1000);
-      const quote = `${pair.from}${pair.to}=X`;
-      fetchExchangeData(quote, fromDate, toDate);
-    });
+    const fromDate =
+      Math.floor(Date.now() / 1000) - convertPeriodToSeconds("1Y");
+    const toDate = Math.floor(Date.now() / 1000);
+    const quote = `${pair.from}${pair.to}=X`;
+
+    console.log(
+      `Fetching 1-year data for ${quote} from ${fromDate} to ${toDate}`
+    );
+
+    fetchExchangeData(quote, fromDate, toDate)
+      .then(() => {
+        console.log(`Data fetched successfully for ${quote}`);
+      })
+      .catch((error) => {
+        console.error(`Error fetching data for ${quote}: ${error.message}`);
+      });
   });
 });
 
-function getPeriodInSeconds(period) {
+function convertPeriodToSeconds(period) {
   switch (period) {
     case "1W":
       return 7 * 24 * 60 * 60;
