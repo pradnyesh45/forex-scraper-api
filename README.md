@@ -1,6 +1,7 @@
 # Forex Scraper
 
-Scrapes Historical Exchange Data from Yahoo Finance Website
+- Scrapes Historical Exchange Data from Yahoo Finance Website
+- Github Link: https://github.com/pradnyesh45/forex-scraper-api
 
 ## How to run?
 
@@ -10,7 +11,7 @@ Scrapes Historical Exchange Data from Yahoo Finance Website
 - Type `npm install` to install all the dependencies.
 - Type `node api/app.js` to run the server on localhost 3000. Leave it running.
 - Open another terminal and again go to root directory of forex-scraper-api.
-- Type `node scraper/sync_data.js`, it will run the cron job server which run every minute. Wait for 1-2 minutes.
+- Type `node scraper/sync_data.js`, it will run the cron job server which runs every minute. Wait for 1-2 minutes.
 - We are done with the setup.
 
 ## Example in Action
