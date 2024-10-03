@@ -1,12 +1,29 @@
 const axios = require("axios");
 const cheerio = require("cheerio");
 const { storeData } = require("./database");
+const https = require("https");
+
+// Create an agent with a larger maxHeaderSize
+const agent = new https.Agent({
+  maxHeaderSize: 32768, // Increase to 32KB
+});
 
 async function fetchExchangeData(quote, fromDate, toDate) {
   const url = `https://finance.yahoo.com/quote/${quote}/history/?period1=${fromDate}&period2=${toDate}`;
+  console.log("Fetching data from:", url);
 
   try {
-    const response = await axios.get(url);
+    const response = await axios.get(url, {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36",
+        "Accept-Language": "en-US,en;q=0.9",
+        Accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+      },
+      httpsAgent: agent, // Use the custom agent
+    });
+    console.log(`Data fetched successfully for ${quote}`);
     const $ = cheerio.load(response.data);
 
     const data = [];
@@ -30,6 +47,7 @@ async function fetchExchangeData(quote, fromDate, toDate) {
         });
       }
     });
+    console.log(data);
 
     await storeData(data);
   } catch (error) {
